@@ -3,7 +3,7 @@
 
 { pkgs
 # Document source
-, src ? ./.
+, src ? ./src
 
 # Name of the final pdf file
 , name ? "document.pdf"
