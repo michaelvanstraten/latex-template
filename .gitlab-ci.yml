@@ -15,7 +15,7 @@ pages:
   extends: .nix
   script: |
     nix build .#document 
-    # fix https://gitlab.com/gitlab-org/gitlab/-/issues/19746
+    # Fix for https://gitlab.com/gitlab-org/gitlab/-/issues/19746
     BUILD_RESULT="$(realpath result)"
     unlink result
     cp --archive --no-target-directory "$BUILD_RESULT" public
