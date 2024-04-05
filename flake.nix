@@ -1,18 +1,16 @@
 {
-  description = "Build LaTeX document with minted";
+  description = "Deterministic LaTeX compilation with Nix";
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils }:
     {
-      templates.document = {
+      templates.default = {
         path = ./.;
-        description = "LaTeX document with minted support";
+        description = "A LaTeX project";
       };
 
       lib.latexmk = import ./build-document.nix;
-
-      defaultTemplate = self.templates.document;
     } // flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -56,13 +54,13 @@
           wmctrl
         ];
       in
-      rec {
-        devShell = pkgs.mkShell {
+      {
+        devShells.default = pkgs.mkShell {
           buildInputs = [ latex-packages dev-packages ];
         };
         
         packages = flake-utils.lib.flattenTree {
-          document = import ./build-document.nix {
+          default = import ./build-document.nix {
             inherit pkgs;
             texlive = latex-packages;
             shellEscape = true;
@@ -70,8 +68,6 @@
             SOURCE_DATE_EPOCH = toString self.lastModified;
           };
         };
-
-        defaultPackage = packages.document;
       }
     );
 }
