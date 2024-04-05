@@ -11,15 +11,14 @@
     - gitlab-ci-nix-cache-before
   after_script:
     - gitlab-ci-nix-cache-after
-build:
-  stage: build
+pages:
   extends: .nix
   script: |
     nix build .#document 
     # fix https://gitlab.com/gitlab-org/gitlab/-/issues/19746
     BUILD_RESULT="$(realpath result)"
     unlink result
-    cp --archive --no-target-directory "$BUILD_RESULT" result
+    cp --archive --no-target-directory "$BUILD_RESULT" public
   artifacts:
     paths:
-      - "result/"
+      - "public/"
