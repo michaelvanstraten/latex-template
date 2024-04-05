@@ -14,7 +14,7 @@
 pages:
   extends: .nix
   script: |
-    nix build .#document 
+    nix build .
     # Fix for https://gitlab.com/gitlab-org/gitlab/-/issues/19746
     BUILD_RESULT="$(realpath result)"
     unlink result
