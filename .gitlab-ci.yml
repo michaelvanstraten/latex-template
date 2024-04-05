@@ -13,6 +13,7 @@
     - gitlab-ci-nix-cache-after
 pages:
   extends: .nix
+  stage: build
   script: |
     nix build .
     # Fix for https://gitlab.com/gitlab-org/gitlab/-/issues/19746
