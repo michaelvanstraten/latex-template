@@ -3,7 +3,12 @@
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
     {
       templates.default = {
         path = ./.;
@@ -11,7 +16,9 @@
       };
 
       lib.latexmk = import ./build-document.nix;
-    } // flake-utils.lib.eachDefaultSystem (system:
+    }
+    // flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs { inherit system; };
 
@@ -56,9 +63,12 @@
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = [ latex-packages dev-packages ];
+          buildInputs = [
+            latex-packages
+            dev-packages
+          ];
         };
-        
+
         packages = flake-utils.lib.flattenTree {
           default = import ./build-document.nix {
             inherit pkgs;
@@ -68,6 +78,8 @@
             SOURCE_DATE_EPOCH = toString self.lastModified;
           };
         };
+
+        formatter = pkgs.nixfmt-rfc-style;
       }
     );
 }
