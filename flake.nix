@@ -83,10 +83,12 @@
 
         checks =
           let
-            inherit (pkgs.lib.fileset) fileFilter toList;
+            inherit (pkgs.lib.fileset) fileFilter toList union;
             inherit (builtins) concatStringsSep;
-            nix-files = fileFilter (file: file.hasExt "nix") ./.;
-            latex-files = fileFilter (file: file.hasExt "tex") ./.;
+            find-files = ext: fileFilter (file: file.hasExt ext) ./.;
+            nix-files = find-files "nix";
+            latex-files = find-files "tex";
+            markdown-files = find-files "md";
           in
           {
             fmt =
@@ -104,12 +106,21 @@
                   nixfmt --check ${concatStringsSep " " (toList nix-files)} 
                   latexindent -check ${concatStringsSep " " (toList latex-files)} 
                 '';
-            lint = pkgs.runCommand "lint-checks" { buildInputs = [ latex-packages ]; } ''
-              mkdir -p "$out"
+            lint =
+              pkgs.runCommand "lint-checks"
+                {
+                  buildInputs = with pkgs; [
+                    latex-packages
+                    ltex-ls
+                  ];
+                }
+                ''
+                  mkdir -p "$out"
 
-              chktex ${concatStringsSep " " (toList latex-files)} 
-              echo \'${concatStringsSep " " (toList latex-files)}\' | xargs lacheck
-            '';
+                  chktex ${concatStringsSep " " (toList latex-files)} 
+                  echo \'${concatStringsSep " " (toList latex-files)}\' | xargs lacheck
+                  ltex-cli --server-command-line=ltex-ls ${concatStringsSep " " (toList (union latex-files markdown-files))}
+                '';
           };
       }
     );
