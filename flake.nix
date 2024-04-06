@@ -104,6 +104,12 @@
                   nixfmt --check ${concatStringsSep " " (toList nix-files)} 
                   latexindent -check ${concatStringsSep " " (toList latex-files)} 
                 '';
+            lint = pkgs.runCommand "lint-checks" { buildInputs = [ latex-packages ]; } ''
+              mkdir -p "$out"
+
+              chktex ${concatStringsSep " " (toList latex-files)} 
+              echo \'${concatStringsSep " " (toList latex-files)}\' | xargs lacheck
+            '';
           };
       }
     );
