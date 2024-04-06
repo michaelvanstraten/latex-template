@@ -80,6 +80,31 @@
         };
 
         formatter = pkgs.nixfmt-rfc-style;
+
+        checks =
+          let
+            inherit (pkgs.lib.fileset) fileFilter toList;
+            inherit (builtins) concatStringsSep;
+            nix-files = fileFilter (file: file.hasExt "nix") ./.;
+            latex-files = fileFilter (file: file.hasExt "tex") ./.;
+          in
+          {
+            fmt =
+              pkgs.runCommand "fmt-checks"
+                {
+                  buildInputs = with pkgs; [
+                    latex-packages
+                    nixfmt-rfc-style
+                  ];
+                }
+                ''
+                  # We *must* create some output, usually contains test logs for checks
+                  mkdir -p "$out"
+
+                  nixfmt --check ${concatStringsSep " " (toList nix-files)} 
+                  latexindent -check ${concatStringsSep " " (toList latex-files)} 
+                '';
+          };
       }
     );
 }
