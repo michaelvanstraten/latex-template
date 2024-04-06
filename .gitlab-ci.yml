@@ -11,6 +11,12 @@
     - gitlab-ci-nix-cache-before
   after_script:
     - gitlab-ci-nix-cache-after
+
+checks:
+  extends: .nix
+  stage: test
+  script: nix flake check --all-systems
+
 pages:
   extends: .nix
   stage: build
