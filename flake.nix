@@ -2,12 +2,14 @@
   description = "Deterministic LaTeX compilation with Nix";
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.git-hooks.url = "github:michaelvanstraten/git-hooks.nix";
 
   outputs =
     {
       self,
       nixpkgs,
       flake-utils,
+      git-hooks,
     }:
     {
       templates.default = {
@@ -62,13 +64,6 @@
         ];
       in
       {
-        devShells.default = pkgs.mkShell {
-          buildInputs = [
-            latex-packages
-            dev-packages
-          ];
-        };
-
         packages = flake-utils.lib.flattenTree {
           default = import ./build-document.nix {
             inherit pkgs;
@@ -79,49 +74,53 @@
           };
         };
 
+        checks =
+          # let
+          #   inherit (pkgs.lib.fileset) fileFilter toList union;
+          #   inherit (builtins) concatStringsSep;
+          #   find-files = ext: fileFilter (file: file.hasExt ext) ./.;
+          #   latex-files = find-files "tex";
+          #   markdown-files = find-files "md";
+          # in
+          {
+            # lint =
+            #   pkgs.runCommand "lint-checks"
+            #     {
+            #       buildInputs = with pkgs; [
+            #         latex-packages
+            #         ltex-ls
+            #       ];
+            #     }
+            #     ''
+            #       mkdir -p "$out"
+            #       ltex-cli --server-command-line=ltex-ls ${concatStringsSep " " (toList (union latex-files markdown-files))}
+            #     '';
+            git-hooks = git-hooks.lib.${system}.run {
+              src = ./.;
+              hooks = {
+                # nix checks
+                nixfmt = {
+                  enable = true;
+                  package = pkgs.nixfmt-rfc-style;
+                };
+                # LaTeX checks
+                chktex.enable = true;
+                latexindent.enable = true;
+                lacheck.enable = true;
+              };
+            };
+          };
+
         formatter = pkgs.nixfmt-rfc-style;
 
-        checks =
-          let
-            inherit (pkgs.lib.fileset) fileFilter toList union;
-            inherit (builtins) concatStringsSep;
-            find-files = ext: fileFilter (file: file.hasExt ext) ./.;
-            nix-files = find-files "nix";
-            latex-files = find-files "tex";
-            markdown-files = find-files "md";
-          in
-          {
-            fmt =
-              pkgs.runCommand "fmt-checks"
-                {
-                  buildInputs = with pkgs; [
-                    latex-packages
-                    nixfmt-rfc-style
-                  ];
-                }
-                ''
-                  # We *must* create some output, usually contains test logs for checks
-                  mkdir -p "$out"
-
-                  nixfmt --check ${concatStringsSep " " (toList nix-files)} 
-                  latexindent -check ${concatStringsSep " " (toList latex-files)} 
-                '';
-            lint =
-              pkgs.runCommand "lint-checks"
-                {
-                  buildInputs = with pkgs; [
-                    latex-packages
-                    ltex-ls
-                  ];
-                }
-                ''
-                  mkdir -p "$out"
-
-                  chktex ${concatStringsSep " " (toList latex-files)} 
-                  echo \'${concatStringsSep " " (toList latex-files)}\' | xargs lacheck
-                  ltex-cli --server-command-line=ltex-ls ${concatStringsSep " " (toList (union latex-files markdown-files))}
-                '';
-          };
+        devShells.default = pkgs.mkShell {
+          inherit (self.checks.${system}.git-hooks) shellHook;
+          buildInputs = [
+            self.checks.${system}.git-hooks.enabledPackages
+            latex-packages
+            dev-packages
+          ];
+        };
       }
     );
 }
