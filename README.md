@@ -1,12 +1,10 @@
-LaTeX flake template
-====================
+# LaTeX flake template
 
 `LaTeX` template that I use as a starting point for all my documents. It is
 structured in multiple files ordered numerically. To compile simply
 run `latexmk`.
 
-Flakes
-------
+## Flakes
 
 There is no need to use `flakes`, this template can be used with any working
 `LaTeX` installation, but `flakes` allow for build reproducibility and a
@@ -23,19 +21,19 @@ compilation significantly by caching all LaTeX packages.
 
 To build the current in the current directory run:
 
-```
+```sh
 nix build
 ```
 
 Or even compile the document without even cloning it before hand with:
 
-```
+```sh
 nix build github:leixb/latex-template
 ```
 
 To get a shell with all the dependencies available:
 
-```
+```sh
 nix develop
 ```
 

@@ -42,7 +42,7 @@
 }:
 
 let
-  lib = pkgs.lib;
+  inherit (pkgs) lib;
   defaultFlags = [
     "-interaction=nonstopmode"
     "-pdf"

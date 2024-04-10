@@ -103,10 +103,16 @@
                   enable = true;
                   package = pkgs.nixfmt-rfc-style;
                 };
+                statix.enable = true;
                 # LaTeX checks
                 chktex.enable = true;
                 latexindent.enable = true;
                 lacheck.enable = true;
+                # Other checks
+                actionlint.enable = true;
+                markdownlint.enable = true;
+                prettier.enable = true;
+                trim-trailing-whitespace.enable = true;
               };
             };
           };
