@@ -18,6 +18,15 @@ checks:
   stage: test
   script: nix flake check --all-systems
 
+diff:
+  extends: .nix
+  stage: test
+  script: |
+    nix develop --command git latexdiff --run-biber --no-view --output diff.pdf HEAD --
+  artifacts:
+    paths:
+      - diff.pdf
+
 build:document:
   extends: .nix
   stage: build
