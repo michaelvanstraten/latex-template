@@ -94,6 +94,7 @@
             (texlive.withPackages (
               packages: with packages; [
                 latexdiff
+                latexpand
                 git-latexdiff
               ]
             ))
