@@ -17,7 +17,7 @@ checks:
   stage: test
   script: nix flake check --all-systems
 
-pages:
+build:document:
   extends: .nix
   stage: build
   script: |
@@ -26,6 +26,12 @@ pages:
     BUILD_RESULT="$(realpath result)"
     unlink result
     cp --archive --no-target-directory "$BUILD_RESULT" public
+
+pages:
+  stage: deploy
+  script: ":"
+  only:
+    refs: [build:document]
   artifacts:
     paths:
       - "public/"
