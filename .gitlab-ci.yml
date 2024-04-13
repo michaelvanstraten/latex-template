@@ -13,14 +13,19 @@
   after_script:
     - gitlab-ci-nix-cache-after
 
+stages:
+  - lint
+  - build
+  - deploy
+
 checks:
   extends: .nix
-  stage: test
+  stage: lint
   script: nix flake check --all-systems
 
 diff:
   extends: .nix
-  stage: test
+  stage: lint
   script: |
     nix develop --command git latexdiff --run-biber --no-view --output diff.pdf HEAD --
   artifacts:
