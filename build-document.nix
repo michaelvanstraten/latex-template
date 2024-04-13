@@ -62,10 +62,11 @@ pkgs.stdenvNoCC.mkDerivation rec {
   inherit src name;
 
   buildInputs =
-    [
-      texlive
-      pkgs.git
-    ]
+    (with pkgs; [
+      coreutils
+      ncurses
+    ])
+    ++ [ texlive ]
     ++ lib.optional minted [
       pkgs.which
       pygments

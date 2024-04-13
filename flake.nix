@@ -24,52 +24,23 @@
       let
         pkgs = import nixpkgs { inherit system; };
 
-        latex-packages = with pkgs; [
-          (texlive.combine {
-            inherit (texlive)
-              scheme-medium
-              framed
-              titlesec
-              cleveref
-              multirow
-              wrapfig
-              tabu
-              threeparttable
-              threeparttablex
-              makecell
-              environ
-              biblatex
-              biber
-              fvextra
-              upquote
-              catchfile
-              xstring
-              csquotes
-              minted
-              dejavu
-              comment
-              footmisc
-              xltabular
-              ltablex
-              ;
-          })
-          which
-          python39Packages.pygments
-        ];
-
-        dev-packages = with pkgs; [
-          texlab
-          zathura
-          wmctrl
-        ];
+        texlive = pkgs.texliveSmall.withPackages (
+          packages: with packages; [
+            comment
+            latexmk
+            luatex
+            biblatex
+            biber
+          ]
+        );
       in
       {
         packages = flake-utils.lib.flattenTree {
           default = import ./build-document.nix {
             inherit pkgs;
-            texlive = latex-packages;
             shellEscape = true;
             minted = true;
+            inherit texlive;
             SOURCE_DATE_EPOCH = toString self.lastModified;
           };
         };
@@ -87,7 +58,6 @@
             #   pkgs.runCommand "lint-checks"
             #     {
             #       buildInputs = with pkgs; [
-            #         latex-packages
             #         ltex-ls
             #       ];
             #     }
@@ -123,8 +93,12 @@
           inherit (self.checks.${system}.git-hooks) shellHook;
           buildInputs = [
             self.checks.${system}.git-hooks.enabledPackages
-            latex-packages
-            dev-packages
+            (texlive.withPackages (
+              packages: with packages; [
+                latexdiff
+                git-latexdiff
+              ]
+            ))
           ];
         };
       }
