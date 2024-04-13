@@ -38,8 +38,6 @@
         packages = flake-utils.lib.flattenTree {
           default = import ./build-document.nix {
             inherit pkgs;
-            shellEscape = true;
-            minted = true;
             inherit texlive;
             SOURCE_DATE_EPOCH = toString self.lastModified;
           };
