@@ -41,12 +41,13 @@ build:document:
     BUILD_RESULT="$(realpath result)"
     unlink result
     cp --archive --no-target-directory "$BUILD_RESULT" public
+  artifacts:
+    paths:
+      - "public/"
 
 pages:
   stage: deploy
   script: ":"
-  only:
-    refs: [build:document]
   artifacts:
     paths:
       - "public/"
