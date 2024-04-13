@@ -27,7 +27,12 @@ diff:
   extends: .nix
   stage: lint
   script: |
-    nix develop --command git latexdiff --run-biber --no-view --output diff.pdf HEAD --
+    if [ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]; then
+      OLD="$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    else
+      OLD="$CI_COMMIT_BEFORE_SHA"
+    fi
+    nix develop --command git latexdiff --run-biber --no-view --output diff.pdf $OLD HEAD
   artifacts:
     paths:
       - diff.pdf
