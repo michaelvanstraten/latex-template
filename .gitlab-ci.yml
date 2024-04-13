@@ -1,5 +1,6 @@
 .nix:
-  image: registry.gitlab.com/cynerd/gitlab-ci-nix@sha256:f36756b8634942d94b4f98c685b8133a782116a635c7b82743f48b3ed5d4192c
+  # image: registry.gitlab.com/cynerd/gitlab-ci-nix@sha256:f36756b8634942d94b4f98c685b8133a782116a635c7b82743f48b3ed5d4192c
+  image: registry.gitlab.com/cynerd/gitlab-ci-nix
   # Currently not supported by provided runner
   # tags: ["docker"]
   cache:
